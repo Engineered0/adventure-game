@@ -1,0 +1,87 @@
+
+class Room:
+    def __init__(self, name, description):
+        self.name = name
+        self.description = description
+        self.exits = {}
+        self.items = []
+
+    def add_exit(self, direction, room):
+        self.exits[direction] = room
+
+    def add_item(self, item):
+        self.items.append(item)
+
+    def __str__(self):
+        return f'{self.name}\n{self.description}'
+
+class Item:
+    def __init__(self, name, description):
+        self.name = name
+        self.description = description
+
+class Player:
+    def __init__(self, current_room):
+        self.current_room = current_room
+        self.inventory = []
+
+    def move(self, direction):
+        if direction in self.current_room.exits:
+            self.current_room = self.current_room.exits[direction]
+            print(self.current_room)
+        else:
+            print('There is no exit in that direction.')
+
+    def take(self, item_name):
+        for item in self.current_room.items:
+            if item.name.lower() == item_name.lower():
+                self.inventory.append(item)
+                self.current_room.items.remove(item)
+                print(f'You take the {item.name}.')
+                return
+        print('Item not found.')
+
+# Initialize rooms
+kitchen = Room('Kitchen', 'A dark and dusty room with an old stove.')
+living_room = Room('Living Room', 'A spacious room with a fireplace.')
+bedroom = Room('Bedroom', 'A small bedroom with a bed and a nightstand.')
+
+# Set up room exits
+kitchen.add_exit('north', living_room)
+living_room.add_exit('south', kitchen)
+living_room.add_exit('east', bedroom)
+bedroom.add_exit('west', living_room)
+
+# Set up items in rooms
+kitchen.add_item(Item('Knife', 'A sharp kitchen knife.'))
+living_room.add_item(Item('Matches', 'A box of matches.'))
+bedroom.add_item(Item('Key', 'An old rusty key.'))
+
+# Initialize player
+player = Player(kitchen)
+
+# Game loop
+while True:
+    print('--------------------------------------')
+    print(player.current_room)
+    command = input('Command (move/take/quit): ').lower().split()
+
+    if command[0] == 'move':
+        if len(command) > 1:
+            player.move(command[1])
+        else:
+            print('Please specify a direction.')
+
+    elif command[0] == 'take':
+        if len(command) > 1:
+            player.take(command[1])
+        else:
+            print('Please specify an item to take.')
+
+    elif command[0] == 'quit':
+        print('Exiting game.')
+        break
+
+    else:
+        print('Invalid command.')
+
